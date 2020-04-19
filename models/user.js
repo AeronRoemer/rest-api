@@ -9,11 +9,11 @@ module.exports = (sequelize, DataTypes) => {
   },
     firstName: DataTypes.STRING,
     lastName: DataTypes.STRING,
-    email: DataTypes.STRING,
+    emailAddress: DataTypes.STRING,
     password: DataTypes.STRING
-  }, { sequelize });
-  
-    // associations can be defined here
+  }, {});
+
+   // associations can be defined here
     User.associate = (models) => { User.hasMany(models.Course,
       { foreignKey: { 
         fieldname: 'userId',

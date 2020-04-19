@@ -7,8 +7,11 @@ module.exports = (sequelize, DataTypes) => {
     estimatedTime: DataTypes.STRING,
     materialsNeeded: DataTypes.STRING
   }, {});
-  Course.associate = function(models) {
-    // associations can be defined here
+
+  Course.associate = (models) => { Course.belongsTo(models.User, 
+    { foreignKey: { 
+      fieldname: 'userId',
+      allowNull: false } });
   };
   return Course;
 };
