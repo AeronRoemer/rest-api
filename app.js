@@ -20,7 +20,7 @@ app.use(morgan('dev'));
 
 // TODO setup your api routes here
 const mainRoutes = require('./routes');
-app.use(mainRoutes)
+app.use('/api', mainRoutes)
 
 // setup a friendly greeting for the root route
 app.get('/', (req, res) => {
