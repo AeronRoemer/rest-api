@@ -12,7 +12,7 @@ function asyncHandler(cb){
         res.status(201)
       } catch(error){
         res.status(500).send(error);
-        console.log(error.message)
+        console.log(error.message, error.stack)
       }
     }
   }
@@ -39,6 +39,22 @@ router.get('/users/:id', asyncHandler(async (req, res) =>{
 
 }))
 
+//sends a POST request to create a new user
+router.post('/users', asyncHandler(async (req, res) =>{
+    //'user' body sent & tested via Postman in the following format:
+    // {
+    //     "firstName":"Hoad",
+    //     "lastName":"Gilled",
+    //     "emailAddress":"hogiel@gaddme.com",
+    //     "password":"badPass"
+    //     }
+    let user = await User.create(req.body);
+     res.status(201).json(user);
+
+}))
+
+
+
 //sends a GET request to view a single course
 router.get('/courses/:id', asyncHandler(async (req, res) =>{
     let course = await Course.findByPk(req.params.id);
@@ -46,3 +62,18 @@ router.get('/courses/:id', asyncHandler(async (req, res) =>{
 
 }))
 
+//sends a POST request to create a new course
+router.post('/courses', asyncHandler(async (req, res) =>{
+  //'course' body sent & tested via Postman in the following format:
+  // {
+  //   "title":"New Course",
+  //   "description":"Just a test Course",
+  //   "estimatedTime": "One Week",
+  //   "materialsNeeded": "Nothing",
+  //   "UserId": "2"
+  //   }
+    
+  let course = await Course.create(req.body);
+   res.status(201).json(course);
+
+}))
