@@ -77,3 +77,37 @@ router.post('/courses', asyncHandler(async (req, res) =>{
    res.status(201).json(course);
 
 }))
+
+//sends a PUT request to update a course
+router.put('/courses/:id', asyncHandler(async (req, res) =>{
+  // 'course' body sent & tested via Postman in the following format:
+  // {
+  //   "title":"New Updated Course",
+  //   "description":"Just an Updated test Course",
+  //   "estimatedTime": "One Week",
+  //   "materialsNeeded": "Nothing",
+  //   "UserId": "2"
+  //   }
+    
+  let course = await Course.findByPk(req.params.id);
+  await course.update(req.body)
+   res.status(204);
+
+}))
+
+//sends a DELETE request to destroy a course
+router.delete('/courses/:id', asyncHandler(async (req, res) =>{
+  //'course' body sent & tested via Postman in the following format:
+  // {
+  //   "title":"New Course",
+  //   "description":"Just a test Course",
+  //   "estimatedTime": "One Week",
+  //   "materialsNeeded": "Nothing",
+  //   "UserId": "2"
+  //   }
+    
+  let course = await Course.findByPk(req.params.id);
+  await course.destroy()
+   res.status(204);
+
+}))
