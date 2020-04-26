@@ -2,6 +2,10 @@ const express = require('express');
 const router = express.Router();
 const User = require('../models').User;
 const Course = require('../models').Course;
+const bcryptjs = require('bcryptjs'); //for hashing passwords
+const auth = require('basic-auth'); //basic-auth to parse https headers
+
+
 module.exports = router;
 //validation variables
 const { check, validationResult } = require('express-validator');
@@ -11,18 +15,45 @@ function asyncHandler(cb){
     return async(req, res, next) => {
       try {
         await cb(req, res, next)
-        res.status(201)
+        res.status(201).end()
       } catch(error){
         res.status(500).send(error);
         console.log(error.message, error.stack)
       }
     }
   }
+//middleware to Authenticate User
 
+const authenticateUser = (req, res, next) => {
+    // Parse the user's credentials from the Authorization header.
+    const credentials = auth(req);
+
+    // If the user's credentials are available...
+    // Attempt to retrieve the user from the data store
+    // by their username (i.e. the user's "key"
+    // from the Authorization header).
+  
+    // If a user was successfully retrieved from the data store...
+    // Use the bcryptjs npm package to compare the user's password
+    // (from the Authorization header) to the user's password
+    // that was retrieved from the data store.
+  
+    // If the passwords match...
+    // Then store the retrieved user object on the request object
+    // so any middleware functions that follow this middleware function
+    // will have access to the user's information.
+  
+    // If user authentication failed...
+    // Return a response with a 401 Unauthorized HTTP status code.
+  
+    // Or if user authentication succeeded...
+    // Call the next() method.
+  };
+  
   //send a GET request to view all courses
 router.get('/courses', asyncHandler(async (req, res) =>{
         let courses = await Course.findAll();
-         res.status(200).json(courses);
+         res.status(200).json(courses).end();
          //converts to JSON object
 
 }))
@@ -30,14 +61,14 @@ router.get('/courses', asyncHandler(async (req, res) =>{
 //sends a GET request to view all users
 router.get('/users', asyncHandler(async (req, res) =>{
     let user = await User.findAll(req.params.id);
-     res.status(200).json(user);
+     res.status(200).json(user).end();
 
 }))
 
 //sends a GET request to view a single user
 router.get('/users/:id', asyncHandler(async (req, res) =>{
     let user = await User.findByPk(req.params.id);
-     res.status(200).json(user);
+     res.status(200).json(user).end();
 
 }))
 
@@ -76,8 +107,10 @@ router.post('/users', [firstNameValidationChain, lastNameValidationChain],
     // Return the validation errors to the client.
        res.status(400).json({ errors: errorMessages }); 
       } else {
-    let user = await User.create(req.body);
-     res.status(201).json(user).end;
+    const user = req.body;
+    user.password = bcryptjs.hashSync(user.password); //hashes password
+    let userData = await User.create(user);
+     res.status(201).json(userData).end();
   }
 }))
 
@@ -86,7 +119,7 @@ router.post('/users', [firstNameValidationChain, lastNameValidationChain],
 //sends a GET request to view a single course
 router.get('/courses/:id', asyncHandler(async (req, res) =>{
     let course = await Course.findByPk(req.params.id);
-     res.status(200).json(course);
+     res.status(200).json(course).end();
 
 }))
 
@@ -111,7 +144,7 @@ router.post('/courses', [titleValidationChain, userIdValidationChain],
          res.status(400).json({ errors: errorMessages }); 
         } else {
           let course = await Course.create(req.body);
-          res.status(201).json(course);       
+          res.status(201).json(course).end();       
     }
 }))
 
@@ -120,7 +153,7 @@ router.put('/courses/:id', asyncHandler(async (req, res) =>{
   // 'course' body sent & tested via Postman 
   let course = await Course.findByPk(req.params.id);
   await course.update(req.body)
-   res.status(204);
+   res.status(204).end();
 
 }))
 
@@ -130,6 +163,6 @@ router.delete('/courses/:id', asyncHandler(async (req, res) =>{
     
   let course = await Course.findByPk(req.params.id);
   await course.destroy()
-   res.status(204);
+   res.status(204).end();
 
 }))
